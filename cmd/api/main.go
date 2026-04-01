@@ -32,11 +32,12 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to connect to database: %v", err)
 		}
-		defer pgStore.DB.Close()
 
 		if err := pgStore.EnsureTable(); err != nil {
+			pgStore.DB.Close()
 			log.Fatalf("Failed to create table: %v", err)
 		}
+		defer pgStore.DB.Close()
 
 		h := handler.NewPostgresHandler(pgStore)
 		h.RegisterRoutes(r)
