@@ -145,3 +145,7 @@ The CI workflow already has a matrix strategy with one Go version. Your tasks:
 | SonarCloud Integration | 8 |
 | Code Coverage Improvement | 6 |
 | **Total** | **24** |
+
+## Author
+- FH-Prof. Dr. Marc Kurz (marc.kurz@fh-hagenberg.at)
+
