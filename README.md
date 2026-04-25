@@ -1,239 +1,100 @@
-# Exercise 1: Git Basics -- PRs, Interactive Rebase & Unit Tests
+# Continuous Delivery in Agile Software Development -- Exercises
 
-**Course:** Continuous Delivery in Agile Software Development (Master)
-**Points:** 24
+This repository contains four progressive exercises for the Master course **Continuous Delivery in Agile Software Development**.
 
-## Learning Objectives
+## Overview
 
-- Master the Pull Request workflow (branch, commit, review, merge)
-- Use Git Interactive Rebase to clean up commit history
-- Write meaningful unit tests in Go
-- Apply Conventional Commits
+| Exercise | Topic | Branch |
+|----------|-------|--------|
+| 1 | Git Basics: PRs, Interactive Rebase, Unit Tests | `exercise/01-git-basics` |
+| 2 | Microservice Architecture, Docker & GitHub Actions | `exercise/02-microservice-docker` |
+| 3 | CI Pipeline: SonarCloud, Matrix Builds, Linting | `exercise/03-ci-pipeline` |
+| 4 | Vulnerability Scanning & Kubernetes Deployment | `exercise/04-security-k8s` |
+
+## Technology Stack
+
+- **Language:** Go 1.24+
+- **Web Framework:** Gorilla Mux
+- **Database:** PostgreSQL
+- **Containerization:** Docker & Docker Compose
+- **CI/CD:** GitHub Actions
+- **Code Quality:** SonarCloud, golangci-lint
+- **Security:** Trivy, govulncheck
+- **Deployment:** Kubernetes (Minikube)
+
+## Project: Product Catalog API
+
+Throughout the four exercises you will build and evolve a **Product Catalog API** -- a RESTful web service for managing products (create, read, update, delete). The API is written in Go and grows in complexity with each exercise.
+
+### What the Application Does
+
+The Product Catalog API exposes the following HTTP endpoints:
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | Health check |
+| GET | `/products` | List all products |
+| POST | `/products` | Create a new product |
+| GET | `/products/{id}` | Get a product by ID |
+| PUT | `/products/{id}` | Update a product |
+| DELETE | `/products/{id}` | Delete a product |
+
+A product has three fields: `id`, `name`, and `price`.
+
+### Project Structure
+
+```
+cmd/api/main.go                # Application entry point -- starts the HTTP server
+internal/
+  model/product.go             # Product data model and validation
+  store/
+    memory.go                  # In-memory store (Exercise 1-2)
+    postgres.go                # PostgreSQL store (from Exercise 2)
+  handler/handler.go           # HTTP request handlers (routing, JSON encoding)
+Dockerfile                     # Multi-stage Docker build (from Exercise 2)
+docker-compose.yml             # Orchestrates API + PostgreSQL (from Exercise 2)
+.github/workflows/ci.yml       # CI/CD pipeline (from Exercise 2, extended in 3-4)
+k8s/                           # Kubernetes manifests (Exercise 4)
+```
+
+### What You Build in Each Exercise
+
+| Exercise | What You Do |
+|----------|-------------|
+| **1 -- Git Basics** | Fork the repo, write unit tests for the in-memory store, create your first Pull Request, and practice interactive rebase to clean up commit history. |
+| **2 -- Microservice & Docker** | Understand the microservice architecture, complete a GitHub Actions CI pipeline with a Docker build job, analyze the Dockerfile and Docker Compose setup, and add HTTP handler tests. |
+| **3 -- CI Pipeline** | Extend the pipeline with matrix builds (multiple Go versions and OS), integrate golangci-lint for code quality, set up SonarCloud for static analysis, and improve test coverage to ≥ 80%. |
+| **4 -- Security & K8s** | Scan the Docker image with Trivy, scan Go dependencies with govulncheck, deploy the application to a local Kubernetes cluster (Minikube), and configure production-readiness features (probes, resource limits). |
+
+By the end of the course, you will have a fully containerized Go microservice with a complete CI/CD pipeline including automated testing, linting, security scanning, and Kubernetes deployment.
 
 ## Prerequisites
 
 - Go 1.24+ installed
 - Git 2.30+
-- GitHub account with access to this repository
+- GitHub Account
+- Docker Desktop (from Exercise 2)
+- Minikube (Exercise 4)
 
-## Project Overview
+## Getting Started
 
-This is a **Product Catalog API** written in Go. It provides a REST API for managing products (CRUD operations). The code is structured as follows:
-
-```
-cmd/api/main.go              # Application entry point
-internal/model/product.go    # Product data model + validation
-internal/store/memory.go     # In-memory product store
-internal/handler/handler.go  # HTTP request handlers
-```
-
-### Build & Test
+1. **Fork** this repository on GitHub (click the "Fork" button in the top right corner). **Uncheck** "Copy the `main` branch only" so that all exercise branches are included in your fork.
+2. **Clone** your fork:
 
 ```bash
-go test ./...                    # Run all tests
-go test -v ./internal/model/     # Run model tests with verbose output
-go test -cover ./...             # Run tests with coverage
-go build -o api-server ./cmd/api # Build the server binary
+git clone https://github.com/<your-username>/CI-CD-MCM.git
+cd CI-CD-MCM
 ```
 
----
-
-## Tasks
-
-### Task 1: Repository Setup (2 Points)
-
-1. Fork this repository into your own GitHub account. Name it `cd-mcm-exercise-[Nachname]`. **Uncheck** "Copy the `main` branch only" so that all exercise branches are included.
-2. Clone your fork locally.
-3. Verify the project builds and tests pass:
-   ```bash
-   go test ./...
-   ```
-4. **Deliverable:** Screenshot or link to your forked repository.
-
----
-
-### Task 2: Unit Tests (6 Points)
-
-The store package (`internal/store/memory_test.go`) contains incomplete tests marked with `TODO` comments. Your task:
-
-1. **Complete `TestCreateAndGet`**: Create a product, retrieve it by ID, and verify all fields match.
-2. **Add `TestUpdateProduct`**: Create a product, update it, verify the update was applied.
-3. **Add `TestDeleteProduct`**: Create a product, delete it, verify it's gone (GetByID returns error).
-4. **Add `TestGetByIDNotFound`**: Verify that GetByID with a non-existent ID returns `ErrNotFound`.
-
-Requirements:
-- Each test must have a clear name describing what it tests.
-- Use table-driven tests for at least one test function.
-- All tests must pass: `go test -v ./internal/store/`
-
-**Deliverable:** Completed test file committed on a `feature/unit-tests` branch.
-
-#### Go Testing Hints
-
-If you're new to Go testing, here are some tips to get you started:
-
-**Basic test structure:**
-```go
-func TestSomething(t *testing.T) {
-    // 1. Arrange -- set up test data
-    store := NewMemoryStore()
-    p := model.Product{Name: "Test", Price: 9.99}
-
-    // 2. Act -- call the function under test
-    created := store.Create(p)
-
-    // 3. Assert -- check the result
-    if created.Name != "Test" {
-        t.Errorf("expected name 'Test', got '%s'", created.Name)
-    }
-}
-```
-
-**Comparing errors:**
-```go
-if err != ErrNotFound {
-    t.Errorf("expected ErrNotFound, got %v", err)
-}
-```
-
-**Table-driven tests** (test multiple cases in one function):
-```go
-func TestSomething(t *testing.T) {
-    tests := []struct {
-        name string
-        // ... add fields for input and expected output
-    }{
-        {"case 1", /* ... */},
-        {"case 2", /* ... */},
-    }
-
-    for _, tt := range tests {
-        t.Run(tt.name, func(t *testing.T) {
-            // Arrange, Act, Assert for each test case
-        })
-    }
-}
-```
-
-**Useful commands:**
-```bash
-go test -v ./internal/store/   # Verbose output -- see each test name and result
-go test -run TestCreate ./...  # Run only tests matching "TestCreate"
-```
-
-**Available store methods** (see `internal/store/memory.go`):
-- `NewMemoryStore()` -- creates a new empty store
-- `store.Create(product)` -- returns the product with assigned ID
-- `store.GetByID(id)` -- returns `(product, error)`
-- `store.GetAll()` -- returns `[]Product`
-- `store.Update(id, product)` -- returns `(product, error)`
-- `store.Delete(id)` -- returns `error`
-
----
-
-### Task 3: Feature Branch & Pull Request (8 Points)
-
-1. Create a branch `feature/about-me` from `main`.
-2. Create a file `about-me.md` in the repository root containing:
-   - Your name and program of study
-   - Your experience with Go and Git (1-2 sentences each)
-   - What you expect to learn in this course
-   - Why Continuous Delivery matters for agile teams (2-3 sentences)
-3. Commit with a proper Conventional Commit message (e.g., `docs: add about-me with background info`).
-4. Push the branch and open a **Pull Request** to `main`.
-5. Request a review from a fellow student. Address at least one review comment.
-6. Merge the PR after approval.
-
-**Deliverable:** Link to the merged PR.
-
----
-
-### Task 4: Interactive Rebase (8 Points)
-
-A special branch `exercise/01-rebase-practice` contains a deliberately messy commit history. Your task is to clean it up using `git rebase -i`.
-
-#### Setup
+3. Switch to the respective exercise branch:
 
 ```bash
-git checkout exercise/01-rebase-practice
-git checkout -b my-rebase-practice    # Work on your own branch
-git log --oneline                     # Review the commit history
+git checkout exercise/01-git-basics
 ```
 
-You will see commits with these issues:
-- **Typo in commit message:** "commmit G" has three m's
-- **Commits that should be squashed:** Multiple small "fix" commits that belong together
-- **Wrong commit order:** Some commits are in an illogical order
-- **Unnecessary commit:** A debug commit that should be dropped
+> **Important:** Do not clone the original repository directly — always work on your own fork so you can push changes and create Pull Requests.
 
-#### Your Tasks
-
-Using `git rebase -i <base-commit>`:
-
-1. **Reword** the commit with the typo ("commmit G" → "commit G")
-2. **Squash** the three "fix readme" commits into a single commit
-3. **Reorder** commits so that related changes are adjacent
-4. **Drop** the "add debug output" commit
-
-#### How to use Interactive Rebase
-
-```bash
-git rebase -i HEAD~10   # Rebase the last 10 commits
-
-# In the editor, change the action keyword before each commit:
-# pick   = keep the commit as-is
-# reword = keep the commit but edit the message
-# squash = meld into previous commit (combine messages)
-# fixup  = meld into previous commit (discard this message)
-# drop   = remove the commit entirely
-# Reorder lines to reorder commits
-```
-
-**Deliverable:** Run `git log --oneline` after your rebase and include a screenshot showing the cleaned-up history. Push as `solution/01-rebase-[Nachname]`.
-
----
-
-## Conventions
-
-### Conventional Commits
-
-Use these prefixes for all commit messages:
-
-| Prefix | Usage |
-|--------|-------|
-| `feat:` | New feature |
-| `fix:` | Bug fix |
-| `docs:` | Documentation only |
-| `test:` | Adding or updating tests |
-| `refactor:` | Code refactoring (no behavior change) |
-| `chore:` | Maintenance tasks |
-
-### Branch Naming
-
-- `feature/<short-description>`
-- `fix/<issue-id>-<short-description>`
-- `docs/<short-description>`
-
-### Useful Git Config
-
-```bash
-git config --global core.editor "code --wait"
-git config --global alias.s status
-git config --global alias.lg "log --oneline --graph --all"
-```
-
----
-
-## Grading
-
-| Task | Points |
-|------|--------|
-| Repository Setup | 2 |
-| Unit Tests | 6 |
-| Feature Branch & PR | 8 |
-| Interactive Rebase | 8 |
-| **Total** | **24** |
+Each exercise branch contains a detailed `README.md` with instructions.
 
 ## Author
 - FH-Prof. Dr. Marc Kurz (marc.kurz@fh-hagenberg.at)
-
