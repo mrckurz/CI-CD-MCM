@@ -84,6 +84,35 @@ The CI workflow (`.github/workflows/ci.yml`) has a `TODO` for a Docker build job
 
 **Deliverable:** Working CI pipeline (green check on your PR). Screenshot of the Actions run.
 
+> **Heads-up: Workflow does not run? ("Get started with Actions")**
+>
+> If your Actions tab keeps showing the "Get started with Actions" onboarding page, two things are usually going on:
+>
+> 1. **GitHub lists workflows from the default branch.** If `.github/workflows/ci.yml` only exists on your feature branch (e.g. `exercise/02-microservice-docker`) and not on `main`, the Actions tab UI looks empty until the first run completes.
+> 2. **The default trigger is restricted to `main`.** The shipped `ci.yml` has:
+>    ```yaml
+>    on:
+>      push:
+>        branches: [main]
+>      pull_request:
+>        branches: [main]
+>    ```
+>    A push to `exercise/02-microservice-docker` matches neither filter, so nothing fires.
+>
+> **Two ways to fix it — pick one:**
+>
+> - **Option A (matches the task — "green check on PR"):** open a Pull Request inside your own fork: base `main` ← compare `exercise/02-microservice-docker`. The existing `pull_request: branches: [main]` filter triggers, the workflow runs, and merging the PR also lands the workflow on `main` so the Actions tab is clean afterwards.
+> - **Option B (loosen the trigger):** edit `.github/workflows/ci.yml` on your feature branch and change `on:` to:
+>    ```yaml
+>    on:
+>      push:
+>        branches: ["**"]
+>      pull_request:
+>    ```
+>    Commit + push — the workflow now runs on every branch.
+>
+> Also make sure GitHub Actions is **enabled** on your fork (Actions tab → "I understand my workflows, go ahead and enable them"). GitHub disables Actions on forks by default.
+
 ---
 
 ### Task 3: Docker & Docker Compose (8 Points)
