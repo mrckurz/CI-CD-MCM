@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, exercise/02-microservice-docker]
+    branches: [main]
   pull_request:
-    branches: [main, exercise/02-microservice-docker]
+    branches: [main]
 
 jobs:
   test:
