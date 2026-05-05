@@ -1,3 +1,5 @@
+![CI](https://github.com/ph1l96/cd-mcm-exercise-Schaupp/actions/workflows/ci.yml/badge.svg)
+
 # Exercise 2: Microservice Architecture, Docker & GitHub Actions
 
 **Course:** Continuous Delivery in Agile Software Development (Master)
