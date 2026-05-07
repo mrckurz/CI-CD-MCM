@@ -1,5 +1,7 @@
 # Exercise 2: Microservice Architecture, Docker & GitHub Actions
 
+[![CI](https://github.com/Joejn/cd-mcm-exercise-neuhauser/actions/workflows/ci.yml/badge.svg)](https://github.com/Joejn/cd-mcm-exercise-neuhauser/actions/workflows/ci.yml)
+
 **Course:** Continuous Delivery in Agile Software Development (Master)
 **Points:** 24
 
@@ -19,6 +21,7 @@
 ## Project Overview
 
 The Product Catalog API has been extended with:
+
 - **PostgreSQL storage** (`internal/store/postgres.go`) -- persistent database backend
 - **Dockerfile** -- multi-stage build for minimal container image
 - **docker-compose.yml** -- orchestrates API + PostgreSQL
@@ -103,13 +106,13 @@ The CI workflow (`.github/workflows/ci.yml`) has a `TODO` for a Docker build job
 >
 > - **Option A (matches the task — "green check on PR"):** open a Pull Request inside your own fork: base `main` ← compare `exercise/02-microservice-docker`. The existing `pull_request: branches: [main]` filter triggers, the workflow runs, and merging the PR also lands the workflow on `main` so the Actions tab is clean afterwards.
 > - **Option B (loosen the trigger):** edit `.github/workflows/ci.yml` on your feature branch and change `on:` to:
->    ```yaml
->    on:
->      push:
->        branches: ["**"]
->      pull_request:
->    ```
->    Commit + push — the workflow now runs on every branch.
+>   ```yaml
+>   on:
+>     push:
+>       branches: ["**"]
+>     pull_request:
+>   ```
+>   Commit + push — the workflow now runs on every branch.
 >
 > Also make sure GitHub Actions is **enabled** on your fork (Actions tab → "I understand my workflows, go ahead and enable them"). GitHub disables Actions on forks by default.
 
@@ -123,6 +126,7 @@ The CI workflow (`.github/workflows/ci.yml`) has a `TODO` for a Docker build job
    - What is the final image size? Compare it to a single-stage build.
 
 2. **Run the application with Docker Compose:**
+
    ```bash
    docker compose up --build
    ```
@@ -158,27 +162,27 @@ All tests must use `httptest.NewRecorder` (no actual HTTP server needed).
 
 ## API Reference
 
-| Method | Endpoint | Description | Request Body |
-|--------|----------|-------------|--------------|
-| GET | `/health` | Health check | -- |
-| GET | `/products` | List all products | -- |
-| POST | `/products` | Create product | `{"name":"...","price":0.00}` |
-| GET | `/products/{id}` | Get product by ID | -- |
-| PUT | `/products/{id}` | Update product | `{"name":"...","price":0.00}` |
-| DELETE | `/products/{id}` | Delete product | -- |
+| Method | Endpoint         | Description       | Request Body                  |
+| ------ | ---------------- | ----------------- | ----------------------------- |
+| GET    | `/health`        | Health check      | --                            |
+| GET    | `/products`      | List all products | --                            |
+| POST   | `/products`      | Create product    | `{"name":"...","price":0.00}` |
+| GET    | `/products/{id}` | Get product by ID | --                            |
+| PUT    | `/products/{id}` | Update product    | `{"name":"...","price":0.00}` |
+| DELETE | `/products/{id}` | Delete product    | --                            |
 
 ---
 
 ## Grading
 
-| Task | Points |
-|------|--------|
-| Architecture Documentation | 2 |
-| GitHub Actions Workflow | 6 |
-| Docker & Docker Compose | 8 |
-| Handler Tests | 8 |
-| **Total** | **24** |
+| Task                       | Points |
+| -------------------------- | ------ |
+| Architecture Documentation | 2      |
+| GitHub Actions Workflow    | 6      |
+| Docker & Docker Compose    | 8      |
+| Handler Tests              | 8      |
+| **Total**                  | **24** |
 
 ## Author
-- FH-Prof. Dr. Marc Kurz (marc.kurz@fh-hagenberg.at)
 
+- FH-Prof. Dr. Marc Kurz (marc.kurz@fh-hagenberg.at)
