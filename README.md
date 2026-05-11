@@ -3,6 +3,8 @@
 **Course:** Continuous Delivery in Agile Software Development (Master)
 **Points:** 24
 
+[![CI](https://github.com/timdavidfriedrich/cd-mcm-exercise-friedrich/actions/workflows/ci.yml/badge.svg)](https://github.com/timdavidfriedrich/cd-mcm-exercise-friedrich/actions/workflows/ci.yml)
+
 ## Learning Objectives
 
 - Understand microservice architecture with a REST API in Go
@@ -152,4 +154,3 @@ All tests must use `httptest.NewRecorder` (no actual HTTP server needed).
 
 ## Author
 - FH-Prof. Dr. Marc Kurz (marc.kurz@fh-hagenberg.at)
-
