@@ -96,17 +96,17 @@
    minikube start
    ```
 
-2. **Build the image inside Minikube's Docker daemon:**
+2. **Build the image and load it into Minikube:**
    ```bash
-   eval $(minikube docker-env)
    docker build -t product-catalog:latest .
+   minikube image load product-catalog:latest
    ```
+
+   > **Why not `eval $(minikube docker-env)`?** Modern Docker (24+) uses BuildKit/Buildx, which builds on the host's buildx builder and ignores the docker-env switch. `minikube image load` works reliably regardless of your Docker version.
 
 3. **Deploy the application:**
    ```bash
-   kubectl apply -f k8s/namespace.yml
-   kubectl apply -f k8s/postgres-deployment.yml
-   kubectl apply -f k8s/api-deployment.yml
+   kubectl apply -f k8s/
    ```
 
 4. **Verify the deployment:**
@@ -115,13 +115,17 @@
    kubectl logs deployment/product-catalog-api -n product-catalog
    ```
 
-5. **Access the API:**
+   > **Expect a few API restarts at first.** The API pods start before PostgreSQL is fully ready and exit when they can't connect to the database. Kubernetes restarts them; after ~1-2 minutes both pods should reach `1/1 Running`. If they're stuck in `CrashLoopBackOff` after 3 minutes, run `kubectl logs <pod> -n product-catalog --previous` to investigate.
+
+5. **Access the API.** Easiest cross-platform option: `kubectl port-forward` in a second terminal.
    ```bash
-   minikube service product-catalog-api -n product-catalog --url
-   # Use the returned URL to test the API
-   curl <URL>/health
-   curl <URL>/products
+   kubectl port-forward svc/product-catalog-api 8080:8080 -n product-catalog
+   # In a third terminal:
+   curl http://localhost:8080/health
+   curl http://localhost:8080/products
    ```
+
+   Alternative: `minikube service product-catalog-api -n product-catalog --url`. On macOS with the Docker driver this command **holds the terminal open** as it maintains a tunnel — use a second terminal for `curl`, or stick with `port-forward`.
 
 6. **Test CRUD operations** against the Kubernetes-deployed API.
 
@@ -170,7 +174,7 @@
 # Minikube
 minikube start / stop / delete
 minikube dashboard                    # Open Kubernetes dashboard
-eval $(minikube docker-env)           # Use Minikube's Docker daemon
+minikube image load <image>:<tag>     # Load a host-built image into Minikube
 
 # kubectl
 kubectl get pods -n product-catalog
